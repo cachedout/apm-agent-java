@@ -35,7 +35,6 @@ pipeline {
     booleanParam(name: 'test_ci', defaultValue: false, description: 'Enable test')
     booleanParam(name: 'smoketests_ci', defaultValue: false, description: 'Enable Smoke tests')
     booleanParam(name: 'bench_ci', defaultValue: false, description: 'Enable benchmarks')
-    booleanParam(name: 'debug', defaultValue: false, description: 'Enable debugging')
   }
 
   stages {
@@ -85,8 +84,6 @@ pipeline {
       }
     }
     stage('Tests') {
-      // # FIXME for testing
-      agent { label 'linux && immutable && dev' }
       environment {
         MAVEN_CONFIG = "${params.MAVEN_CONFIG} ${env.MAVEN_CONFIG}"
       }
@@ -266,8 +263,6 @@ pipeline {
       }
     }
     stage('Integration Tests') {
-      // FIXME dev
-      agent { label 'linux && immutable && dev' }
       agent none
       when {
         beforeAgent true
@@ -384,10 +379,7 @@ def releasePackages(){
 
       # Release the binaries
       # providing settings in arguments to make sure they are propagated to the forked maven release process
-
-      ## FIXME remove before release
-      echo "Would run ./mvnw release:prepare release:perform --settings .ci/settings.xml -Darguments="--settings .ci/settings.xml" --batch-mode"
-      #./mvnw release:prepare release:perform --settings .ci/settings.xml -Darguments="--settings .ci/settings.xml" --batch-mode
+      ./mvnw release:prepare release:perform --settings .ci/settings.xml -Darguments="--settings .ci/settings.xml" --batch-mode
       ''')
     }
   }
