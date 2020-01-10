@@ -35,6 +35,8 @@ pipeline {
     booleanParam(name: 'test_ci', defaultValue: false, description: 'Enable test')
     booleanParam(name: 'smoketests_ci', defaultValue: false, description: 'Enable Smoke tests')
     booleanParam(name: 'bench_ci', defaultValue: false, description: 'Enable benchmarks')
+    booleanParam(name: 'doc_ci', defaultValue: false, description: 'Enable doc build')
+    booleanParam(name: 'debug', defaultValue: false, description: 'Enable debugging')
   }
 
   stages {
@@ -267,6 +269,7 @@ pipeline {
       when {
         beforeAgent true
         allOf {
+          expression { return params.test_ci }
           anyOf {
             environment name: 'GIT_BUILD_CAUSE', value: 'pr'
             expression { return !params.Run_As_Master_Branch }
@@ -379,7 +382,10 @@ def releasePackages(){
 
       # Release the binaries
       # providing settings in arguments to make sure they are propagated to the forked maven release process
-      ./mvnw release:prepare release:perform --settings .ci/settings.xml -Darguments="--settings .ci/settings.xml" --batch-mode
+
+      ## FIXME remove before release
+      echo "Would run ./mvnw release:prepare release:perform --settings .ci/settings.xml -Darguments="--settings .ci/settings.xml" --batch-mode"
+      #./mvnw release:prepare release:perform --settings .ci/settings.xml -Darguments="--settings .ci/settings.xml" --batch-mode
       ''')
     }
   }
