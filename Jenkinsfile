@@ -44,7 +44,7 @@ pipeline {
         HOME = "${env.WORKSPACE}"
 //        JAVA_HOME = "${env.HUDSON_HOME}/.java/java10"
 // FIXME just for dev
-        JAVA_HOME = "/home/vagrant/openjdk-10.0.2_linux-x64_bin/"
+        JAVA_HOME = "/home/vagrant/jdk-10.0.2"
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
         MAVEN_CONFIG = "${params.MAVEN_CONFIG} ${env.MAVEN_CONFIG}"
       }
