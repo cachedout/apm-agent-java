@@ -35,6 +35,7 @@ pipeline {
     booleanParam(name: 'test_ci', defaultValue: true, description: 'Enable test')
     booleanParam(name: 'smoketests_ci', defaultValue: true, description: 'Enable Smoke tests')
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
+    booleanParam(name: 'dev_release', defaultValue: false, description: 'Enable release devel stage')
   }
 
   stages {
@@ -280,6 +281,33 @@ pipeline {
         githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
       }
     }
+    stage('Release') {
+      agent { label 'linux && immutable' }
+      options { skipDefaultCheckout() }
+      environment {
+        HOME = "${env.WORKSPACE}"
+        JAVA_HOME = "${env.HUDSON_HOME}/.java/java10"
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+        TMP_WORKSPACE="${env.WORKSPACE}/@tmp"
+        KEY_FILE="${env.WORKSPACE}/private.key"
+        GNUPGHOME="${env.TMP_WORKSPACE}/keyring"
+      }
+      input {
+        message 'Should we release a new version?'
+        ok 'Yes, we should.'
+      }
+      when {
+        beforeAgent true
+        anyOf {
+          tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
+          expression { return params.dev_release }
+        }
+      }
+      steps {
+        echo "OK, in pipelinem"
+      }
+    }
+
     stage('AfterRelease') {
       options { skipDefaultCheckout() }
       when {
