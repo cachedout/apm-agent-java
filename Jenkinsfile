@@ -310,6 +310,7 @@ pipeline {
         to gather results for a public page programmatically without
         signing up for a public status page yourself */
         httpRequest(url: "https://oss.sonatype.NOTVAILD")
+        echo "I should not see this"
       }
     }
 
