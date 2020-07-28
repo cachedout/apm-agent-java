@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 set +x
-export FOO='bar'
+echo 'bar'
 set -x
