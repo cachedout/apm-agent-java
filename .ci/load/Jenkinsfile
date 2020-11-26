@@ -55,7 +55,7 @@ pipeline {
         stage('Load test') {
             parallel {
                 stage('Load generation') {
-                    // agent { label 'metal' }
+                    agent { label 'metal' }
                     steps {
                         withSecretVault(secret: 'secret/apm-team/ci/bandstand', user_var_name: 'APP_TOKEN_TYPE', pass_var_name: 'APP_TOKEN'){
                             echo 'Preparing load generation..'
@@ -70,7 +70,7 @@ pipeline {
                     }
                 }
                 stage('Test application') {
-                    // agent { label 'benchmarks' }
+                    agent { label 'benchmarks' }
                     stages{
                         stage('Provision Java') {
                             steps {
