@@ -116,6 +116,7 @@ pipeline {
         stage('Set release version') {
           steps {
             // sh "ls -a /var/lib/jenkins"
+             sh "${JENKINS_HOME}"
             // sh "ls -a ${env.HUDSON_HOME}/.java/"
             // sh "ls -a ${env.JAVA_HOME}"
 
