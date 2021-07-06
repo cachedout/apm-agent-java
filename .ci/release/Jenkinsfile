@@ -72,7 +72,7 @@ pipeline {
       options { skipDefaultCheckout () }
        environment {
          HOME = "${env.WORKSPACE}"
-         JAVA_HOME = "${env.HUDSON_HOME}/.java/java11"
+         JAVA_HOME = "/var/lib/jenkins/.java/java11"
          PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
        }
       stages{
@@ -115,9 +115,9 @@ pipeline {
         }
         stage('Set release version') {
           steps {
-            sh "ls -a /var/lib/jenkins"
-            sh "ls -a ${env.HUDSON_HOME}/.java/"
-            sh "ls -a ${env.JAVA_HOME}"
+            // sh "ls -a /var/lib/jenkins"
+            // sh "ls -a ${env.HUDSON_HOME}/.java/"
+            // sh "ls -a ${env.JAVA_HOME}"
 
             dir("${BASE_DIR}"){
               script {
