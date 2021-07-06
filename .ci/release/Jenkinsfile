@@ -114,6 +114,9 @@ pipeline {
           }
         }
         stage('Set release version') {
+          when {
+              beforeAgent true
+          }
           steps {
             sh "ls -a ${env.HUDSON_HOME}"
             sh "ls -a ${env.HUDSON_HOME}/.java/"
