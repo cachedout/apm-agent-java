@@ -124,9 +124,9 @@ pipeline {
                     echo "changing project version '${snapshot_version}' not required to release ${release_version}"
                 } else {
                     echo "changing project version from '${snapshot_version}' to '${user_release_version}' to prepare release ${user_release_version}."
-                    sh(label: "mavenVersionUpdate", script: "./mvnw --batch-mode release:update-versions -DdevelopmentVersion=${user_release_version}-SNAPSHOT")
-                    sh(script: "git commit -a -m 'Version bump ${ver}'")
-                    gitPush()
+                    // sh(label: "mavenVersionUpdate", script: "./mvnw --batch-mode release:update-versions -DdevelopmentVersion=${user_release_version}-SNAPSHOT")
+                    // sh(script: "git commit -a -m 'Version bump ${ver}'")
+                    // gitPush()
                 }
               }
             }
@@ -145,8 +145,8 @@ pipeline {
               dir("${BASE_DIR}"){
                 withSecretVault(secret: 'secret/apm-team/ci/nexus', user_var_name: '__unused__', pass_var_name: 'SPID', role_id: 'apm-vault-role-id', secret_id: 'apm-vault-secret-id'){
                   def foundStagingId = nexusFindStagingId(stagingProfileId: "${SPID}", groupId: "co.elastic.apm")
-                  nexusCloseStagingRepository(stagingProfileId: "${SPID}", stagingId: foundStagingId)
-                  nexusReleaseStagingRepository(stagingProfileId: "${SPID}", stagingId: foundStagingId)
+                //   nexusCloseStagingRepository(stagingProfileId: "${SPID}", stagingId: foundStagingId)
+                //   nexusReleaseStagingRepository(stagingProfileId: "${SPID}", stagingId: foundStagingId)
                 }
               }
             }
@@ -157,13 +157,13 @@ pipeline {
             dir("${BASE_DIR}") {
               script {
                 def curVer = mvnVersion()
-                sh(script: "./scripts/jenkins/branch_creation.sh ${curVer}")
+                // sh(script: "./scripts/jenkins/branch_creation.sh ${curVer}")
                 def isMajor = sh(script: "./scripts/jenkins/is_major.sh ${curVer}", returnStatus: true)
                 if (isMajor == 0) {
                   input message: "This was a major version release. Please update the conf.yml in the docs repo before continuing", ok "Continue"
                 }
               }
-              gitPush()
+            //   gitPush()
             }
           }
         }
@@ -176,7 +176,7 @@ pipeline {
                 // Ex: https://www.elastic.co/guide/en/apm/agent/java/current/release-notes-1.x.html#release-notes-1.13.0
                 def finalUrl = sh(script: "scripts/jenkins/generate_release_notes_url.sh ${curVer}", returnStdout: true)
                 githubEnv()
-                def ret = githubReleaseCreate(draft: true, name: "Release ${curVer}", body: "[Release Notes for ${curVer}](${finalUrl})")
+                // def ret = githubReleaseCreate(draft: true, name: "Release ${curVer}", body: "[Release Notes for ${curVer}](${finalUrl})")
                 env.RELEASE_ID = ret['id']
                 env.RELEASE_NOTES_URL = finalUrl
               }
@@ -204,8 +204,9 @@ pipeline {
         stage('Update Cloudfoundry') {
           steps {
             dir("${BASE_DIR}"){
-              sh(script: "./scripts/jenkins/update_cloudfoundry.sh")
-              gitPush()
+            echo "dummy step"
+            //   sh(script: "./scripts/jenkins/update_cloudfoundry.sh")
+            //   gitPush()
             }
           }
         }
@@ -221,7 +222,7 @@ pipeline {
               }
             }
             githubEnv()
-            githubReleasePublish(id: "${env.RELEASE_ID}")
+            // githubReleasePublish(id: "${env.RELEASE_ID}")
           }
         }
         stage('Build and push Docker images') {
@@ -230,19 +231,21 @@ pipeline {
               sh(label: "Build Docker image", script: "./scripts/jenkins/build_docker.sh")
               // Get Docker registry credentials
               dockerLogin(secret: "${ELASTIC_DOCKER_SECRET}", registry: 'docker.elastic.co')
-              sh(label: "Push Docker image", script: "./scripts/jenkins/push_docker.sh")
+            //   sh(label: "Push Docker image", script: "./scripts/jenkins/push_docker.sh")
             }
           }
           post {
             success {
-              notifyStatus(slackStatus: 'good', subject: "[${env.REPO}] Release published", body: "Great news! The release has completed successfully. (<${env.RUN_DISPLAY_URL}|Open>).")
+            //   notifyStatus(slackStatus: 'good', subject: "[${env.REPO}] Release published", body: "Great news! The release has completed successfully. (<${env.RUN_DISPLAY_URL}|Open>).")
+            echo 'fake status'
             }
           }
         }
       }
       post {
         failure {
-          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Release failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
+        //   notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Release failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
+            echo 'fake status'
         }
       }
     }
