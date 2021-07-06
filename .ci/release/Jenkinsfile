@@ -74,6 +74,8 @@ pipeline {
          HOME = "${env.WORKSPACE}"
          JAVA_HOME = "/var/lib/jenkins/.java/java11"
          PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+         VAULT_ROLE_ID = 'apm-vault-role-id'
+         VAULT_AUTH_ID = 'apm-vault-secret-id'
        }
       stages{
         stage('Check oss.sonatype.org') {
