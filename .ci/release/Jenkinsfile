@@ -158,6 +158,7 @@ pipeline {
                 withSecretVault(secret: 'secret/apm-team/ci/nexus', user_var_name: '__unused__', pass_var_name: 'SPID', role_id: 'apm-vault-role-id', secret_id: 'apm-vault-secret-id'){
                     withSecretVault(secret: 'secret/release/nexus', user_var_name: 'nexus_username', pass_var_name: 'nexus_password', role_id: 'apm-vault-role-id', secret_id: 'apm-vault-secret-id'){
                         def foundStagingId = nexusFindStagingId(stagingProfileId: "${SPID}", groupId: "co.elastic.apm", username: "${nexus_username}", password: "${nexus_password}")
+                        echo foundStagingId
                     //   nexusCloseStagingRepository(stagingProfileId: "${SPID}", stagingId: foundStagingId)
                     //   nexusReleaseStagingRepository(stagingProfileId: "${SPID}", stagingId: foundStagingId)
                     }
