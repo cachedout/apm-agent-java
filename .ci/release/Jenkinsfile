@@ -77,80 +77,80 @@ pipeline {
          VAULT_ROLE_ID = 'apm-vault-role-id'
          VAULT_AUTH_ID = 'apm-vault-secret-id'
        }
-      stages{
-        stage('Check oss.sonatype.org') {
-          steps {
-            // If this fails, an exception should be thrown and execution will halt
-            dir("${BASE_DIR}"){
-              script {
-                def r = sh(label: "Check Maven status", script: "./scripts/jenkins/check_maven.sh -u https://status.maven.org/api/v2/summary.json --component OSSRH", returnStatus: true)
-                if (r == 1) {
-                  error("Failing release build because Maven is the OSSRH component is not fully operational. See https://status.maven.org/ for more details.")
-                }
-              }
-            }
-          }
-        }
-        stage('Check master build status') {
-        when { expression { params.check_branch_ci_status } }
-         steps {
-             // If this build is not green: https://apm-ci.elastic.co/job/apm-agent-java/job/apm-agent-java-mbp/job/master/
-             whenTrue(!buildStatus(host: 'apm-ci.elastic.co', job: ['apm-agent-java', 'apm-agent-java-mbp', 'master'], return_boolean: true)) {
-               input(message: "WARNING! The master build is not passing. Do you wish to continue?")
-             }
-         }
-        }
-        stage('Require confirmation that CHANGELOG.asciidoc has been updated') {
-          steps {
-            input(message: """
-            Update CHANGELOG.asciidoc to reflect the new version release:
-            Go over PRs or git log and add bug fixes and features.
-            Move release notes from the Unreleased sub-heading to the correct [[release-notes-{major}.x]] sub-heading (Example PR for 1.13.0 release).
-
-            Click 'Proceed' to confirm that this step has been completed and changes have been pushed or Abort to stop the build.
-            """
-            )
-            dir("${BASE_DIR}") {
-              git credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba', url: 'git@github.com:elastic/apm-agent-java.git'
-            }
-          }
-        }
-        stage('Set release version') {
-          steps {
-            // sh "ls -a /var/lib/jenkins"
-             sh "ls -a ${JENKINS_HOME}"
-            // sh "ls -a ${env.HUDSON_HOME}/.java/"
-            // sh "ls -a ${env.JAVA_HOME}"
-
-            dir("${BASE_DIR}"){
-              script {
-                def snapshot_version = mvnVersion(showQualifiers: true)
-                def release_version = snapshot_version.minus('-SNAPSHOT')
-                def user_release_version = input(message: "Please enter version to release:", parameters: [[
-                    $class: 'StringParameterDefinition',
-                    name: 'Release version',
-                    defaultValue: "${release_version}",
-                    description: "Current project version is ${snapshot_version}, will be released as ${release_version} if unchanged. Input release version without '-SNAPSHOT' suffix"
-                  ]])
-                if( release_version.equals(user_release_version) ) {
-                    echo "changing project version '${snapshot_version}' not required to release ${release_version}"
-                } else {
-                    echo "changing project version from '${snapshot_version}' to '${user_release_version}' to prepare release ${user_release_version}."
-                    // sh(label: "mavenVersionUpdate", script: "./mvnw --batch-mode release:update-versions -DdevelopmentVersion=${user_release_version}-SNAPSHOT")
-                    // sh(script: "git commit -a -m 'Version bump ${ver}'")
-                    // gitPush()
-                }
-              }
-            }
-          }
-        }
-        stage('Wait on internal CI') {
-          steps {
-            notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
-                          body: "Please go to (<${env.BUILD_URL}input|here>) to approve or reject within 12 hours.")
-            input(message: "Start the release job on the internal CI. Click 'Proceed' once the job has succeeded or click 'Abort' if the release has failed and then manually undo the release.")
-          }
-        }
+//      stages{
+//        stage('Check oss.sonatype.org') {
+//          steps {
+//            // If this fails, an exception should be thrown and execution will halt
+//            dir("${BASE_DIR}"){
+//              script {
+//                def r = sh(label: "Check Maven status", script: "./scripts/jenkins/check_maven.sh -u https://status.maven.org/api/v2/summary.json --component OSSRH", returnStatus: true)
+//                if (r == 1) {
+//                  error("Failing release build because Maven is the OSSRH component is not fully operational. See https://status.maven.org/ for more details.")
+//                }
+//              }
+//            }
+//          }
+//        }
+//        stage('Check master build status') {
+//        when { expression { params.check_branch_ci_status } }
+//         steps {
+//             // If this build is not green: https://apm-ci.elastic.co/job/apm-agent-java/job/apm-agent-java-mbp/job/master/
+//             whenTrue(!buildStatus(host: 'apm-ci.elastic.co', job: ['apm-agent-java', 'apm-agent-java-mbp', 'master'], return_boolean: true)) {
+//               input(message: "WARNING! The master build is not passing. Do you wish to continue?")
+//             }
+//         }
+//        }
+//        stage('Require confirmation that CHANGELOG.asciidoc has been updated') {
+//          steps {
+//            input(message: """
+//            Update CHANGELOG.asciidoc to reflect the new version release:
+//            Go over PRs or git log and add bug fixes and features.
+//            Move release notes from the Unreleased sub-heading to the correct [[release-notes-{major}.x]] sub-heading (Example PR for 1.13.0 release).
+//
+//            Click 'Proceed' to confirm that this step has been completed and changes have been pushed or Abort to stop the build.
+//            """
+//            )
+//            dir("${BASE_DIR}") {
+//              git credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba', url: 'git@github.com:elastic/apm-agent-java.git'
+//            }
+//          }
+//        }
+//        stage('Set release version') {
+//          steps {
+//            // sh "ls -a /var/lib/jenkins"
+//             sh "ls -a ${JENKINS_HOME}"
+//            // sh "ls -a ${env.HUDSON_HOME}/.java/"
+//            // sh "ls -a ${env.JAVA_HOME}"
+//
+//            dir("${BASE_DIR}"){
+//              script {
+//                def snapshot_version = mvnVersion(showQualifiers: true)
+//                def release_version = snapshot_version.minus('-SNAPSHOT')
+//                def user_release_version = input(message: "Please enter version to release:", parameters: [[
+//                    $class: 'StringParameterDefinition',
+//                    name: 'Release version',
+//                    defaultValue: "${release_version}",
+//                    description: "Current project version is ${snapshot_version}, will be released as ${release_version} if unchanged. Input release version without '-SNAPSHOT' suffix"
+//                  ]])
+//                if( release_version.equals(user_release_version) ) {
+//                    echo "changing project version '${snapshot_version}' not required to release ${release_version}"
+//                } else {
+//                    echo "changing project version from '${snapshot_version}' to '${user_release_version}' to prepare release ${user_release_version}."
+//                    // sh(label: "mavenVersionUpdate", script: "./mvnw --batch-mode release:update-versions -DdevelopmentVersion=${user_release_version}-SNAPSHOT")
+//                    // sh(script: "git commit -a -m 'Version bump ${ver}'")
+//                    // gitPush()
+//                }
+//              }
+//            }
+//          }
+//        }
+//        stage('Wait on internal CI') {
+//          steps {
+//            notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
+//                          body: "Please go to (<${env.BUILD_URL}input|here>) to approve or reject within 12 hours.")
+//            input(message: "Start the release job on the internal CI. Click 'Proceed' once the job has succeeded or click 'Abort' if the release has failed and then manually undo the release.")
+//          }
+//        }
         stage('Nexus release') {
           steps {
             script {
