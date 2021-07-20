@@ -77,7 +77,7 @@ pipeline {
          VAULT_ROLE_ID = 'apm-vault-role-id'
          VAULT_AUTH_ID = 'apm-vault-secret-id'
        }
-//      stages{
+     stages{
 //        stage('Check oss.sonatype.org') {
 //          steps {
 //            // If this fails, an exception should be thrown and execution will halt
